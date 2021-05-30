@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Lab Task</title>
+    <script src="https://unpkg.com/vue"> </script>
+    <script src="subjects.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+    <link rel="manifest" href="webstore.webmanifest" >
+
+    <style>
+        .product{
+            border: 1px grey;
+            padding: 20px;
+            margin: 20px;
+            text-align: center;
+        }
+    </style>
+
+</head>
+
+<body>
+    <div id="app">
+        
+                    <!-- shoping cart -->
+        <header>
+            <h1>{{sitename}}</h1>
+            <button v-on:click="showcheckout" v-if="enableshoppingcart" >shopping cart</button>
+            <P v-else>shopping cart empty</P>
+            <div v-for="product in cart">
+                <figure>
+                    <img v-bind:src="product.image" width="200" height="200">
+                </figure>
+                <h2 v-html="product.title"></h2>
+                <P>Location: {{product.location}}</P>
+                <p>Price: {{product.price}}</p>
+                <P>Product I.d: {{product.id}}</P>
+                <P>Number of spaces: {{product.availableInventory}}</P>
+                <button v-on:click="removefromcart(product)">removefromcart</button>
+            </div>
+        </header>
+
+                    <!-- subjects -->
+
+        <main>
+            <div v-if="showproduct">
+                <h3>subjects aart</h3>
+                <ul>
+            <li><button v-on:click="sortbyloca(products.location)"> sortbylocation </button></li>
+            <li><button v-on:click="sortbyprice(products.price)"> sortbyprice </button> </li>
+            <li><button v-on:click="sortbyspace(products.availableInventory)"> sortbyspace </button> </li>
+         <li><input type="radio" name="br"  v-on:click="descending(products.title)"> DESCENDING </input></li>
+         <li><input type="radio"  name="br" v-on:click="ascending(products.title)"> ASCENDING </input></li>
+                </ul>
+
+
+
+
+            <div v-for="product in products" >
+      
+            <figure>
+                <img v-bind:src="product.image" width="200" height="200">
+            </figure>
+            <h2 v-html="product.title"></h2> 
+            <P>Location: {{product.location}}</P>
+            <p>Price: {{product.price}}</p>
+            <P>Product I.d: {{product.id}}</P>
+            <P>Number of spaces: {{product.availableInventory}}</P>
+            <button v-on:click="decrement_inventory(product); addtocart(product); "  v-if="isenable(product)"> Add to cart</button> <!-- only show the button when 'canAddToCart' is true when it becomes false the button disappers -->
+
+            <button disabled="disabled" v-else>stock empty</button>
+    </div>
+        </div>
+
+        <div v-else>
+            <h2>Checkout</h2>
+            <form @submit="submitForm">
+                 
+
+                <p>
+                        <label  for="Name" >Name:</label>
+                       
+                        <input type="text" id="Name" name="Name" required>
+                </p>
+           
+                <p>
+                        <label  for="phone">Phone:</label>
+                       
+                        <input type="tel" id="phone" name="phone" required>
+                </p>
+
+         
+
+            <input type="submit">
+          </form>
+
+           
+
+
+
+        </div>
+    </main>
+    </div>
+
+    
+
+
+
+
+
+
+    <script type="text/javascript">
+        var webstore = new Vue({
+            el: "#app",
+            data: {
+                sitename: "After School Club",
+                products: arr,
+
+                
+                cart:[],
+                showproduct:true,
+
+                
+
+            },
+            methods: {
+                decrement_inventory(product) {
+                    product.availableInventory = product.availableInventory - 1;
+                },
+                isenable: function(product){
+                    if(product.availableInventory > 0)
+                    {
+                        return true
+                    }
+                    else{
+                        return false
+                    }
+                },
+                
+               
+                addtocart: function(product){
+                    this.cart.push(product);
+                },
+                showcheckout(){
+                    this.showproduct = this.showproduct ? false : true; 
+                },
+                removefromcart: function(product){
+                    this.cart.pop(product)
+                },
+                sortbyprice(prices){
+                    function compare(a,b){
+                        if(a.price > b.price)
+                        return 1;
+                        if(a.price < b.price)
+                        return -1;
+                        return 0;
+                    }
+                    return this.products.sort(compare)
+                },
+                
+
+                sortbyspace(spaces){
+                    function compare(a,b){
+                        if(a.availableInventory > b.availableInventory)
+                        return 1;
+                        if(a.availableInventory < b.availableInventory)
+                        return -1;
+                        return 0;
+                    }
+                    return this.products.sort(compare)
+                },
+
+                descending(names){
+                    function compare(a,b){
+                        if(a.title < b.title)
+                        return 1;
+                        if(a.title > b.title);
+                        return -1;
+                        return 0;
+                    }
+                    return this.products.sort(compare)
+                
+                },
+                ascending (names){
+                    function compare(a,b){
+                        if(a.title < b.title)
+                        return -1;
+                        if(a.title > b.title);
+                        return 1;
+                        return 0;
+                    }
+                    return this.products.sort(compare)
+                
+                },
+                sortbyloca(location){
+                    function compare(a,b){
+                        if(a.location > b.location)
+                        return 1;
+                        if(a.location < b.location)
+                        return -1;
+                        return 0;
+                    }
+                    return this.products.sort(compare)
+                },
+                submitForm() {
+                    alert('Order submitted!')
+                },
+                
+            },
+
+            computed:{
+                enableshoppingcart: function(){
+                    if (this.cart.length>0)
+                    {
+                        return true
+                    }
+                    else{
+                        return false
+                    }
+                },
+            },
+
+            
+        });
+
+    </script>
+
+</body>
+
+</html>
